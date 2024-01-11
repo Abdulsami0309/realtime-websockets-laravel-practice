@@ -78,3 +78,108 @@ window.Echo = new Echo({
 |
 */
 
+There are Three Types of channel in laravel public , private , presence
+
+------------------- public channel ---------------
+It is used for informing about event to every user 
+
+/*
+|
+| Backend 
+|
+*/
+
+public function broadcastOn(): array
+    {
+        return [
+            new Channel('test-pusher-channel'),
+        ];
+    }
+
+/*
+|
+| Listen On Frontend 
+|
+*/
+Echo.channel('test-pusher-channel').listen('TestPusherEvent', (data) => {
+        console.log(data.data);
+});
+
+------------------- public channel ---------------
+
+------------------- private channel ---------------
+It is used for informing only authenticated users , same like presence channel
+
+/*
+|
+| Backend 
+|
+*/
+
+in the channels.php register the channel as below
+
+Broadcast::channel('test-pusher-channel', function ($user) {
+    return $user;
+});
+
+
+public function broadcastOn(): array
+{
+    return [
+        new PrivateChannel('test-pusher-channel'),
+    ];
+}
+
+
+/*
+|
+| Listen On Frontend 
+|
+*/
+
+Echo.private('test-pusher-channel').listen('TestPusherEvent', (data) => {
+        console.log(data.data);
+});
+
+------------------- presence channel ---------------
+It is used for informing only authenticated users similar to private channel but it gives more information about who is 
+joining , leaving the channel 
+
+/*
+|
+| Backend 
+|
+*/
+
+in the channels.php register the channel as below
+
+Broadcast::channel('test-pusher-channel', function ($user) {
+    return $user;
+});
+
+
+public function broadcastOn(): array
+{
+    return [
+        new PresenceChannel('test-pusher-channel'),
+    ];
+}
+
+
+/*
+|
+| Listen On Frontend 
+|
+*/
+
+Echo.join("test-pusher-channel")
+    .here((users) => {
+        // all joined channel users
+    })
+    .joining((user) => {
+        new joined user
+    })
+    .leaving((user) => {
+        leaved user from the channel
+    })
+    .listen("UserStatusEvent", (e) => {});
